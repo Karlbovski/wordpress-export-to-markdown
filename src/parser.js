@@ -69,7 +69,10 @@ function collectPosts(data, postTypes, config) {
 					title: getPostTitle(post),
 					date: getPostDate(post),
 					categories: getCategories(post),
-					tags: getTags(post)
+					tags: getTags(post),
+					creator: getCreator(post),
+					status: getStatus(post),
+					legacy: "true"
 				},
 				content: translator.getPostContent(post, turndownService, config)
 			}));
@@ -128,6 +131,15 @@ function getCategories(post) {
 
 function getTags(post) {
 	return processCategoryTags(post, 'post_tag');
+}
+
+// new
+function getCreator(post){
+	return post.creator[0];
+}
+
+function getStatus(post){
+	return post.status[0];
 }
 
 function processCategoryTags(post, domain) {
