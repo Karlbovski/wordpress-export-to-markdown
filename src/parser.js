@@ -66,13 +66,31 @@ function collectPosts(data, postTypes, config) {
 					imageUrls: []
 				},
 				frontmatter: {
+					legacy: "true", //content from old website
 					title: getPostTitle(post),
+					description: "",
 					date: getPostDate(post),
-					categories: getCategories(post),
+					// categories: getCategories(post), //multi - categories array
+					category: getCategory(post), //single - first category from categories array
 					tags: getTags(post),
 					creator: getCreator(post),
 					status: getStatus(post),
-					legacy: "true"
+					//cover image
+					thumbnailUrl: "/somewhere/in/the/filesystem",
+					/** BOOKS */
+					year: getPostDate(post, true),
+					pages: "Insert pages",
+					publisher: "Publisher(s)",
+					cta: "Buy the Book",
+					ctaUrl: "https://somewhere.intheinternet",
+					/** end-books  */
+					//tbd - this item locale (from Tags in WP)
+					locale: "en",
+					//tbd-  available also in other locales
+					locales: getEmptyArray(),
+					/**  EVENTS, CONFERENCES  */
+					// eventStart: getPostDate(post),
+					// eventEnd: getPostDate(post),
 				},
 				content: translator.getPostContent(post, turndownService, config)
 			}));
@@ -88,6 +106,10 @@ function collectPosts(data, postTypes, config) {
 		console.log(allPosts.length + ' posts found.');
 	}
 	return allPosts;
+}
+
+function getEmptyArray() {
+	return []
 }
 
 function getPostId(post) {
@@ -112,8 +134,12 @@ function getPostTitle(post) {
 	return post.title[0];
 }
 
-function getPostDate(post) {
-	const dateTime = luxon.DateTime.fromRFC2822(post.pubDate[0], { zone: 'utc' });
+function getPostDate(post, yearOnly) {
+	const dateTime = luxon.DateTime.fromRFC2822(post.pubDate[0], {
+		zone: 'utc'
+	});
+
+	if (yearOnly) return dateTime.toFormat('yyyy');
 
 	if (settings.custom_date_formatting) {
 		return dateTime.toFormat(settings.custom_date_formatting);
@@ -129,16 +155,20 @@ function getCategories(post) {
 	return categories.filter(category => !settings.filter_categories.includes(category));
 }
 
+function getCategory(post) {
+	return processCategoryTags(post, 'category')[0];
+}
+
 function getTags(post) {
 	return processCategoryTags(post, 'post_tag');
 }
 
 // new
-function getCreator(post){
+function getCreator(post) {
 	return post.creator[0];
 }
 
-function getStatus(post){
+function getStatus(post) {
 	return post.status[0];
 }
 
@@ -149,7 +179,9 @@ function processCategoryTags(post, domain) {
 
 	return post.category
 		.filter(category => category.$.domain === domain)
-		.map(({ $: attributes }) => decodeURIComponent(attributes.nicename));
+		.map(({
+			$: attributes
+		}) => decodeURIComponent(attributes.nicename));
 }
 
 function collectAttachedImages(data) {

@@ -53,6 +53,20 @@ function initTurndownService() {
 		}
 	});
 
+	// turndownService.addRule('test', {
+	// 	filter: function (node, options) {
+	// 		return (
+	// 			options.linkStyle === 'inlined' &&
+	// 			node.nodeName === 'span' &&
+	// 			node.getAttribute('style')
+	// 		)
+	// 	},
+	// 	replacement: (content, node) => {
+	// 		console.log("replaced" + content);
+	// 		return '';
+	// 	}
+	// });
+
 	return turndownService;
 }
 
